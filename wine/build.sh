@@ -10,6 +10,7 @@ BUILD_SCRIPT_DIR=$(dirname $(readlink -f $BASH_SOURCE))
 CACHE_DIR="${HOME}/Downloads"
 
 WINE_VERSION=10.18
+WINETRICKS_VERSION=20250102
 
 PACKAGE_PREFIX_DIR="${HOME}/.local"
 
@@ -24,6 +25,12 @@ esac
 WINE_ARCHIVE="$(basename ${WINE_URL})"
 WINE_FOLDER="$(basename ${WINE_URL} .tar.xz)"
 WINE_CACHE="${CACHE_DIR}/${WINE_ARCHIVE}"
+
+
+WINETRICKS_URL="https://github.com/Winetricks/winetricks/archive/refs/tags/${WINETRICKS_VERSION}.tar.gz"
+WINETRICKS_ARCHIVE="winetricks-${WINETRICKS_VERSION}.tar.gz"
+WINETRICKS_FOLDER="$(basename ${WINETRICKS_ARCHIVE} .tar.gz)"
+WINETRICKS_CACHE="${CACHE_DIR}/${WINETRICKS_ARCHIVE}"
 
 SOURCE_DIR="${BUILD_SCRIPT_DIR}/${WINE_FOLDER}"
 BUILD_64_DIR="${BUILD_SCRIPT_DIR}/${WINE_FOLDER}_build-64"
@@ -40,6 +47,9 @@ echo "## -- Start"
 mkdir -p "${CACHE_DIR}"
 [ ! -f "${WINE_CACHE}" ] && echo "## -- Download to ${WINE_CACHE}" && curl -L -o "${WINE_CACHE}" "${WINE_URL}"
 [ ! -d "${SOURCE_DIR}" ] && echo "## -- Extract to ${SOURCE_DIR}" &&  tar xf "${WINE_CACHE}" -C "${BUILD_SCRIPT_DIR}"
+
+[ ! -f "${WINETRICKS_CACHE}" ] && echo "## -- Download to ${WINETRICKS_CACHE}" && curl -L -o "${WINETRICKS_CACHE}" "${WINETRICKS_URL}"
+[ ! -d "${BUILD_SCRIPT_DIR}/${WINETRICKS_FOLDER}" ] && echo "## -- Extract to ${BUILD_SCRIPT_DIR}/${WINETRICKS_FOLDER}" &&  tar xf "${WINETRICKS_CACHE}" -C "${BUILD_SCRIPT_DIR}"
 
 export CFLAGS="-O2 -march=native -mtune=native"
 BUILD_PROC=20
@@ -83,6 +93,10 @@ date_start_install=$(date)
     make install -j ${BUILD_PROC}
     cd "${BUILD_64_DIR}"
     make install -j ${BUILD_PROC}
+
+    echo "install winetricks"
+    cp "${BUILD_SCRIPT_DIR}/${WINETRICKS_FOLDER}/src/winetricks" "${PACKAGE_PREFIX_DIR}/bin/winetricks"
+    chmod +x "${PACKAGE_PREFIX_DIR}/bin/winetricks"
 )
 
 ################################################################################################################
