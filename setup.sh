@@ -86,7 +86,8 @@ SETUP_SCRIPT_DIR=$(dirname $(readlink -f $BASH_SOURCE))
         vulkan-validation-layers \
         vulkan-volk-devel \
         vulkan-volk-devel.i686 \
-        libvkd3d
+        libvkd3d \
+        cabextract p7zip
 
     # make sure to remove packages that will be manually installed
     sudo dnf remove -y wine btop
