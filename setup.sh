@@ -20,13 +20,18 @@ SETUP_SCRIPT_DIR=$(dirname $(readlink -f $BASH_SOURCE))
         gcc-toolset-14
 
     # Nvidia driver setup ; when applicable
-    distro=rhel9
-    arch=x86_64
-    sudo dnf config-manager --add-repo https://developer.download.nvidia.com/compute/cuda/repos/$distro/$arch/cuda-$distro.repo
-    sudo dnf update -y
-    sudo dnf install -y nvidia-driver nvidia-xconfig nvidia-settings \
-        nvidia-driver-cuda-libs nvidia-driver-libs libnvidia-ml libnvidia-fbc \
-        nvidia-driver-cuda-libs.i686 nvidia-driver-libs.i686 libnvidia-ml.i686 libnvidia-fbc.i686
+    set +e
+    NVIDIA_GPU_COUNT=$(lspci | grep -i vga | grep nvidia | wc -l)
+    set -e
+    if [ $NVIDIA_GPU_COUNT -gt 0 ]; then
+        distro=rhel9
+        arch=x86_64
+        sudo dnf config-manager --add-repo https://developer.download.nvidia.com/compute/cuda/repos/$distro/$arch/cuda-$distro.repo
+        sudo dnf update -y
+        sudo dnf install -y nvidia-driver nvidia-xconfig nvidia-settings \
+            nvidia-driver-cuda-libs nvidia-driver-libs libnvidia-ml libnvidia-fbc \
+            nvidia-driver-cuda-libs.i686 nvidia-driver-libs.i686 libnvidia-ml.i686 libnvidia-fbc.i686
+    fi
 
     sudo dnf install -y --nogpgcheck https://mirrors.rpmfusion.org/free/el/rpmfusion-free-release-$(rpm -E %rhel).noarch.rpm
     sudo dnf install -y --nogpgcheck https://mirrors.rpmfusion.org/nonfree/el/rpmfusion-nonfree-release-$(rpm -E %rhel).noarch.rpm
