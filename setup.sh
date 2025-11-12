@@ -97,6 +97,9 @@ SETUP_SCRIPT_DIR=$(dirname $(readlink -f $BASH_SOURCE))
     # make sure to remove packages that will be manually installed
     sudo dnf remove -y wine btop
     sudo dnf autoremove -y
+
+    # Disable SE linux ...
+    sudo sed -i 's/^SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
 )
 
 ${SETUP_SCRIPT_DIR}/modulefiles/setup.sh
